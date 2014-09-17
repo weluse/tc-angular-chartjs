@@ -8,7 +8,8 @@ angular
   'app.radar',
   'app.polararea',
   'app.pie',
-  'app.doughnut'
+  'app.doughnut',
+  'app.gradients'
 ] );
 
 angular

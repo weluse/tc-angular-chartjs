@@ -24,6 +24,7 @@
   TcChartjsPolararea.$inject = [ 'TcChartjsFactory' ];
   TcChartjsPie.$inject = [ 'TcChartjsFactory' ];
   TcChartjsDoughnut.$inject = [ 'TcChartjsFactory' ];
+  TcChartjsFactory.$inject = [ '$compile' ];
 
   function TcChartjs( TcChartjsFactory ) {
     return new TcChartjsFactory();
@@ -53,7 +54,7 @@
     return new TcChartjsFactory( 'doughnut' );
   }
 
-  function TcChartjsFactory() {
+  function TcChartjsFactory( $compile ) {
 
     return function ( chartType ) {
 
@@ -64,7 +65,8 @@
           options: '=chartOptions',
           type: '@chartType',
           legend: '=chartLegend',
-          chart: '=chart'
+          chart: '=chart',
+          overrides: '@chartOverrides'
         },
         link: link
       };
@@ -96,6 +98,24 @@
           function ( value ) {
 
             if ( value ) {
+
+              if ($scope.overrides) {
+                if (value instanceof Array) {
+                  angular.forEach( value, function( dataset, key ) {
+                    if (dataset.hasOwnProperty("overrides")) {
+                      angular.extend(dataset, dataset.overrides( ctx ));
+                    }
+                  });
+                } else if (value.hasOwnProperty("datasets")) {
+                  angular.forEach( value.datasets, function( dataset, key ) {
+                    if (dataset.hasOwnProperty("overrides")) {
+                      angular.extend(dataset, dataset.overrides( ctx ));
+                    }
+                  });
+                }
+              }
+
+
               if ( chartType ) {
                 chartObj = chart[ cleanChartName( chartType ) ]( $scope.data, $scope.options );
               } else if ($scope.type) {
